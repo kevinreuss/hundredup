@@ -1,135 +1,146 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-<meta charset="UTF-8">
-<title>💶 HundredUp 💶</title>
-<style>
-  * {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-  }
-  body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-    background-color: #f0f3f4;
-    color: #333;
-    display: flex;
-    justify-content: center;
-    padding: 20px;
-    padding-top: 50px; /* Enough space on top */
-  }
-  #container {
-    width: 95%; /* Almost full width with a little padding */
-    max-width: none; /* No max-width restriction */
-    background: #ffffff;
-    border-radius: 12px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-    padding: 20px;
-  }
-  header {
-    margin-bottom: 20px;
-    text-align: left;
-  }
-  header h1 {
-    font-size: 2em;
-    color: #1a1a1a;
-  }
-  header p {
-    font-size: 1.2em;
-    color: #666;
-  }
-  .input-group {
-    display: flex;
-    margin-bottom: 20px;
-  }
-  input, button {
-    font-size: 1.1em;
-    padding: 10px 20px;
-    border: 2px solid #d1d1d1;
-    border-radius: 8px;
-    outline: none;
-  }
-  input {
-    flex-grow: 1;
-    margin-right: 10px;
-  }
-  button {
-    background-color: #007aff;
-    color: white;
-    border: none;
-    cursor: pointer;
-    transition: background-color 0.3s;
-  }
-  button:hover {
-    background-color: #0056b3;
-  }
-  #output {
-    display: flex;
-    justify-content: center;
-    flex-wrap: wrap;
-    overflow: auto;
-    padding: 10px;
-    min-height: 50px; /* Ensures visibility */
-  }
-  .euro-icon {
-    font-size: 2vw; /* Larger icons for better visibility */
-    margin: 5px;
-  }
-</style>
-</head>
-<body>
-<div id="container">
-  <header>
-    <h1>💶 HundredUp 💶</h1>
-    <p>Type any amount of euros and see how many hundred euro bills 💶 it is.</p>
-  </header>
-  <div class="input-group">
-    <input type="number" id="amount" placeholder="Type an amount" onkeypress="handleKeyPress(event)">
-    <button onclick="calculate()">Show</button>
-  </div>
-  <div id="output"></div>
-</div>
+  <head>
+    <meta charset="UTF-8" />
+    <title>💶 Stack it up 💶</title>
+    <style>
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          "Helvetica Neue", Arial, sans-serif;
+        background-color: #f0f3f4;
+        color: #333;
+        display: flex;
+        justify-content: center;
+        padding: 20px;
+        padding-top: 50px; /* Enough space on top */
+      }
+      #container {
+        width: 95%; /* Almost full width with a little padding */
+        max-width: none; /* No max-width restriction */
+        background: #ffffff;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        padding: 20px;
+      }
+      header {
+        margin-bottom: 20px;
+        text-align: left;
+      }
+      header h1 {
+        font-size: 2em;
+        color: #1a1a1a;
+      }
+      header p {
+        font-size: 1.2em;
+        color: #666;
+      }
+      .input-group {
+        display: flex;
+        margin-bottom: 20px;
+      }
+      input,
+      button {
+        font-size: 1.1em;
+        padding: 10px 20px;
+        border: 2px solid #d1d1d1;
+        border-radius: 8px;
+        outline: none;
+      }
+      input {
+        flex-grow: 1;
+        margin-right: 10px;
+      }
+      button {
+        background-color: #007aff;
+        color: white;
+        border: none;
+        cursor: pointer;
+        transition: background-color 0.3s;
+      }
+      button:hover {
+        background-color: #0056b3;
+      }
+      #output {
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+        overflow: auto;
+        padding: 10px;
+        min-height: 50px; /* Ensures visibility */
+      }
+      .euro-icon {
+        font-size: 2vw; /* Larger icons for better visibility */
+        margin: 5px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="container">
+      <header>
+        <h1>💶 Stack it up 💶</h1>
+        <p>💶 Stack the bills! 💶</p>
+      </header>
+      <div class="input-group">
+        <input
+          type="number"
+          id="amount"
+          placeholder="Type an amount"
+          onkeypress="handleKeyPress(event)"
+        />
+        <button onclick="calculate()">Show</button>
+      </div>
+      <div id="output"></div>
+    </div>
 
-<script>
-  document.addEventListener('DOMContentLoaded', function() {
-    const storedValue = localStorage.getItem('amount');
-    if (storedValue) {
-      document.getElementById('amount').value = storedValue;
-      calculate();
-    }
-  });
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const storedValue = localStorage.getItem("amount");
+        if (storedValue) {
+          document.getElementById("amount").value = storedValue;
+          calculate();
+        }
+      });
 
-  function formatInput() {
-    const inputField = document.getElementById('amount');
-    const numbersOnly = inputField.value.replace(/[^\d]/g, '');
-    inputField.value = formatNumber(numbersOnly);
-  }
+      function formatInput() {
+        const inputField = document.getElementById("amount");
+        const numbersOnly = inputField.value.replace(/[^\d]/g, "");
+        inputField.value = formatNumber(numbersOnly);
+      }
 
-  function formatNumber(number) {
-    return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
-  }
+      function formatNumber(number) {
+        return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+      }
 
-  function handleKeyPress(event) {
-    if (event.key === "Enter") {
-      calculate();
-    }
-  }
+      function handleKeyPress(event) {
+        if (event.key === "Enter") {
+          calculate();
+        }
+      }
 
-  function calculate() {
-    let inputAmount = document.getElementById('amount').value.replace(/\./g, '');
-    const amount = Math.round(inputAmount / 100) * 100;
-    document.getElementById('amount').value = formatNumber(amount.toString());
-    localStorage.setItem('amount', amount);
-    const numberOfNotes = amount / 100;
-    const output = document.getElementById('output');
-    output.innerHTML = '';
-    for (let i = 0; i < numberOfNotes; i++) {
-      const note = document.createElement('span');
-      note.className = 'euro-icon';
-      note.textContent = '💶';
-      output.appendChild(note);
-    }
-  }
-</script>
-</body>
+      function calculate() {
+        let inputAmount = document
+          .getElementById("amount")
+          .value.replace(/\./g, "");
+        const amount = Math.round(inputAmount / 100) * 100;
+        document.getElementById("amount").value = formatNumber(
+          amount.toString()
+        );
+        localStorage.setItem("amount", amount);
+        const numberOfNotes = amount / 100;
+        const output = document.getElementById("output");
+        output.innerHTML = "";
+        for (let i = 0; i < numberOfNotes; i++) {
+          const note = document.createElement("span");
+          note.className = "euro-icon";
+          note.textContent = "💶";
+          output.appendChild(note);
+        }
+      }
+    </script>
+  </body>
 </html>
