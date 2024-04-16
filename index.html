@@ -78,12 +78,29 @@
         margin: 5px;
       }
     </style>
+    <!-- Hotjar Tracking Code for Stack it up -->
+    <script>
+      (function (h, o, t, j, a, r) {
+        h.hj =
+          h.hj ||
+          function () {
+            (h.hj.q = h.hj.q || []).push(arguments);
+          };
+        h._hjSettings = { hjid: 4945972, hjsv: 6 };
+        a = o.getElementsByTagName("head")[0];
+        r = o.createElement("script");
+        r.async = 1;
+        r.src = t + h._hjSettings.hjid + j + h._hjSettings.hjsv;
+        a.appendChild(r);
+      })(window, document, "https://static.hotjar.com/c/hotjar-", ".js?sv=");
+    </script>
   </head>
   <body>
     <div id="container">
       <header>
         <h1>💶 Stack it up 💶</h1>
         <p>💶 Stack the bills! 💶</p>
+        <p>Enter amount of € here:</p>
       </header>
       <div class="input-group">
         <input
@@ -92,7 +109,7 @@
           placeholder="Type an amount"
           onkeypress="handleKeyPress(event)"
         />
-        <button onclick="calculate()">Show</button>
+        <button onclick="calculate()">Show bills</button>
       </div>
       <div id="output"></div>
     </div>
