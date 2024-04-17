@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <title>💶 Stack it up 💶</title>
+    <title>FinanceFlow: Track and Visualize Your Project Budgets</title>
     <style>
       * {
         box-sizing: border-box;
@@ -10,153 +10,256 @@
         padding: 0;
       }
       body {
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-          "Helvetica Neue", Arial, sans-serif;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
         background-color: #f0f3f4;
         color: #333;
         display: flex;
         justify-content: center;
-        padding: 20px;
-        padding-top: 50px; /* Enough space on top */
+        padding: 50px 20px;
       }
       #container {
-        width: 95%; /* Almost full width with a little padding */
-        max-width: none; /* No max-width restriction */
+        width: 95%;
+        max-width: 800px;
         background: #ffffff;
-        border-radius: 12px;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-        padding: 20px;
-      }
-      header {
-        margin-bottom: 20px;
-        text-align: left;
-      }
-      header h1 {
-        font-size: 2em;
-        color: #1a1a1a;
-      }
-      header p {
-        font-size: 1.2em;
-        color: #666;
-      }
-      .input-group {
-        display: flex;
-        margin-bottom: 20px;
-      }
-      input,
-      button {
-        font-size: 1.1em;
-        padding: 10px 20px;
-        border: 2px solid #d1d1d1;
         border-radius: 8px;
-        outline: none;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        padding: 20px;
+        margin-bottom: 20px;
       }
-      input {
-        flex-grow: 1;
-        margin-right: 10px;
+      .header {
+        margin-bottom: 20px;
+        text-align: center;
+      }
+      .accordion {
+        background-color: #ccdfe3;
+        color: #007aff;
+        cursor: pointer;
+        padding: 12px;
+        width: 100%;
+        border: none;
+        text-align: left;
+        outline: none;
+        font-size: 16px;
+        transition: 0.4s;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      .accordion.paid {
+        background-color: #e7eff1;
+      }
+      .total-accordion {
+        background-color: #bbb;
+      }
+      .panel {
+        padding: 0 18px;
+        background-color: white;
+        display: none;
+        overflow: hidden;
+        border-top: 1px solid #d1d1d1;
+      }
+      input[type="text"] {
+        width: calc(100% - 10px);
+        padding: 8px;
+        margin: 5px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
       }
       button {
+        font-size: 16px;
+        padding: 10px;
+        margin-top: 10px;
+        border-radius: 5px;
+        cursor: pointer;
         background-color: #007aff;
         color: white;
         border: none;
-        cursor: pointer;
         transition: background-color 0.3s;
       }
       button:hover {
-        background-color: #0056b3;
+        /*background-color: #0056b3;*/
       }
-      #output {
+      .move-button {
+        background: none;
+        border: none;
+        cursor: pointer;
+        margin: 0 5px;
+      }
+      .total-summary {
+        font-size: 0.9em;
+        color: #666;
+        margin-bottom: 10px;
+        text-align: center;
+      }
+      .money-display {
         display: flex;
-        justify-content: center;
-        flex-wrap: wrap;
-        overflow: auto;
-        padding: 10px;
-        min-height: 50px; /* Ensures visibility */
+        justify-content: space-between;
+        margin-top: 10px;
       }
       .euro-icon {
-        font-size: 2vw; /* Larger icons for better visibility */
+        font-size: 2vw;
         margin: 5px;
       }
     </style>
-    <!-- Hotjar Tracking Code for Stack it up -->
-    <script>
-      (function (h, o, t, j, a, r) {
-        h.hj =
-          h.hj ||
-          function () {
-            (h.hj.q = h.hj.q || []).push(arguments);
-          };
-        h._hjSettings = { hjid: 4945972, hjsv: 6 };
-        a = o.getElementsByTagName("head")[0];
-        r = o.createElement("script");
-        r.async = 1;
-        r.src = t + h._hjSettings.hjid + j + h._hjSettings.hjsv;
-        a.appendChild(r);
-      })(window, document, "https://static.hotjar.com/c/hotjar-", ".js?sv=");
-    </script>
   </head>
   <body>
     <div id="container">
-      <header>
-        <h1>💶 Stack it up 💶</h1>
-        <p>💶 Stack the bills! 💶</p>
-        <p>Enter amount of € here:</p>
-      </header>
-      <div class="input-group">
-        <input
-          type="number"
-          id="amount"
-          placeholder="Type an amount"
-          onkeypress="handleKeyPress(event)"
-        />
-        <button onclick="calculate()">Show bills</button>
+      <div class="header">
+        <h1 style="padding-bottom: 20px">FinanceFlow</h1>
+        <p>Track and visualize project finances.</p>
       </div>
-      <div id="output"></div>
+      <div class="total-summary" id="total-billed"></div>
+      <div class="total-summary" id="total-unbilled"></div>
+      <button onclick="addProject()">Add New Project</button>
+      <div id="accordion-container"></div>
     </div>
 
     <script>
       document.addEventListener("DOMContentLoaded", function () {
-        const storedValue = localStorage.getItem("amount");
-        if (storedValue) {
-          document.getElementById("amount").value = storedValue;
-          calculate();
-        }
+        loadProjects();
+        displayTotalAccordion();
       });
 
-      function formatInput() {
-        const inputField = document.getElementById("amount");
-        const numbersOnly = inputField.value.replace(/[^\d]/g, "");
-        inputField.value = formatNumber(numbersOnly);
+      function loadProjects() {
+        const projects = JSON.parse(localStorage.getItem("projects")) || [];
+        const container = document.getElementById("accordion-container");
+        container.innerHTML = "";
+        projects.forEach((project, index) => {
+          const accordion = document.createElement("button");
+          accordion.innerHTML = `${project.name} - ${formatCurrency(
+            project.billed
+          )} of ${formatCurrency(project.budget)}`;
+          accordion.className =
+            project.budget - project.billed === 0
+              ? "accordion paid"
+              : "accordion";
+          const moveUp =
+            index > 0
+              ? `<button class="move-button" onclick="moveProject(${index}, -1)">&#9650;</button>`
+              : "";
+          const moveDown =
+            index < projects.length - 1
+              ? `<button class="move-button" onclick="moveProject(${index}, 1)">&#9660;</button>`
+              : "";
+          accordion.innerHTML += `<div>${moveUp} ${moveDown}</div>`;
+
+          const panel = document.createElement("div");
+          panel.className = "panel";
+          panel.innerHTML = `
+                    <input type="text" value="${
+                      project.name
+                    }" onchange="updateProject(${index}, 'name', this.value)">
+                    <input type="text" value="${formatCurrency(
+                      project.budget
+                    )}" onchange="updateProject(${index}, 'budget', parseFloat(this.value.replace(/[^0-9.-]+/g,'')))">
+                    <input type="text" value="${formatCurrency(
+                      project.billed
+                    )}" onchange="updateProject(${index}, 'billed', parseFloat(this.value.replace(/[^0-9.-]+/g,'')))">
+                    <div class="money-display">
+                        <div style="flex: 1"><p>Billed Amount:</p>${displayIcons(
+                          project.billed / 100,
+                          "💶"
+                        )}</div>
+                        <div style="flex: 1"><p>Open Budget:</p>${displayIcons(
+                          (project.budget - project.billed) / 100,
+                          "💶"
+                        )}</div>
+                    </div>
+                `;
+
+          accordion.onclick = function () {
+            this.classList.toggle("active");
+            var panel = this.nextElementSibling;
+            panel.style.display =
+              panel.style.display === "block" ? "none" : "block";
+          };
+
+          container.appendChild(accordion);
+          container.appendChild(panel);
+        });
       }
 
-      function formatNumber(number) {
-        return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+      function displayTotalAccordion() {
+        const container = document.getElementById("accordion-container");
+        const totalAccordion = document.createElement("button");
+        totalAccordion.className = "total-accordion";
+        totalAccordion.textContent = "Total Overview";
+        totalAccordion.onclick = function () {
+          this.classList.toggle("active");
+          var panel = this.nextElementSibling;
+          panel.style.display =
+            panel.style.display === "block" ? "none" : "block";
+        };
+
+        const totalPanel = document.createElement("div");
+        totalPanel.className = "panel";
+        calculateTotals(totalPanel);
+
+        container.appendChild(totalAccordion);
+        container.appendChild(totalPanel);
       }
 
-      function handleKeyPress(event) {
-        if (event.key === "Enter") {
-          calculate();
+      function calculateTotals(panel) {
+        const projects = JSON.parse(localStorage.getItem("projects")) || [];
+        let totalBilled = 0,
+          totalUnbilled = 0;
+        projects.forEach((project) => {
+          totalBilled += Number(project.billed);
+          totalUnbilled += Number(project.budget) - Number(project.billed);
+        });
+        panel.innerHTML = `
+                <div class="money-display">
+                    <div style="flex: 1"><p>Total Billed:</p>${displayIcons(
+                      totalBilled / 100,
+                      "💶"
+                    )}</div>
+                    <div style="flex: 1"><p>Total Open Budget:</p>${displayIcons(
+                      totalUnbilled / 100,
+                      "💶"
+                    )}</div>
+                </div>
+            `;
+      }
+
+      function formatCurrency(amount) {
+        return new Intl.NumberFormat("de-DE", {
+          style: "currency",
+          currency: "EUR",
+        }).format(amount);
+      }
+
+      function displayIcons(count, icon) {
+        let icons = "";
+        for (let i = 0; i < count; i++) {
+          icons += `<span class="euro-icon">${icon}</span>`;
         }
+        return icons;
       }
 
-      function calculate() {
-        let inputAmount = document
-          .getElementById("amount")
-          .value.replace(/\./g, "");
-        const amount = Math.round(inputAmount / 100) * 100;
-        document.getElementById("amount").value = formatNumber(
-          amount.toString()
-        );
-        localStorage.setItem("amount", amount);
-        const numberOfNotes = amount / 100;
-        const output = document.getElementById("output");
-        output.innerHTML = "";
-        for (let i = 0; i < numberOfNotes; i++) {
-          const note = document.createElement("span");
-          note.className = "euro-icon";
-          note.textContent = "💶";
-          output.appendChild(note);
-        }
+      function addProject() {
+        const projects = JSON.parse(localStorage.getItem("projects")) || [];
+        projects.push({ name: "New Project", budget: 1000, billed: 0 });
+        localStorage.setItem("projects", JSON.stringify(projects));
+        loadProjects();
+      }
+
+      function updateProject(index, field, value) {
+        const projects = JSON.parse(localStorage.getItem("projects"));
+        projects[index][field] = value;
+        localStorage.setItem("projects", JSON.stringify(projects));
+        loadProjects();
+        displayTotalAccordion();
+      }
+
+      function moveProject(index, direction) {
+        const projects = JSON.parse(localStorage.getItem("projects"));
+        const project = projects[index];
+        const newIndex = index + direction;
+        projects.splice(index, 1);
+        projects.splice(newIndex, 0, project);
+        localStorage.setItem("projects", JSON.stringify(projects));
+        loadProjects();
+        displayTotalAccordion();
       }
     </script>
   </body>
