@@ -116,16 +116,15 @@
         <p class="overview-p">Total Budget: <span id="totalBudget"></span></p>
         <p class="overview-p">Open Budget: <span id="openBudget"></span></p>
       </div>
-      <div class="total-summary" id="total-billed"></div>
-      <div class="total-summary" id="total-unbilled"></div>
       <button onclick="addProject()">Add New Project</button>
       <div id="accordion-container"></div>
     </div>
 
     <script>
+      let accordionStates = [];
+
       document.addEventListener("DOMContentLoaded", function () {
         loadProjects();
-        displayTotalAccordion();
 
         const projects = JSON.parse(localStorage.getItem("projects")) || [];
         let totalBilled = 0,
@@ -149,35 +148,37 @@
         container.innerHTML = "";
         projects.forEach((project, index) => {
           const accordion = document.createElement("button");
-          accordion.innerHTML = `${project.name} - ${formatCurrency(
+          accordion.innerHTML = `<div><b>${project.name}</b> (${formatCurrency(
             project.billed
-          )} of ${formatCurrency(project.budget)}`;
+          )} of ${formatCurrency(project.budget)})</div>`;
           accordion.className =
             project.budget - project.billed === 0
               ? "accordion paid"
               : "accordion";
+          accordion.setAttribute("data-index", index);
+
           const moveUp =
             index > 0
-              ? `<button class="move-button" onclick="moveProject(${index}, -1)">&#9650;</button>`
+              ? `<button class="move-button" onclick="moveProject(${index}, -1, event)">&#9650;</button>`
               : "";
           const moveDown =
             index < projects.length - 1
-              ? `<button class="move-button" onclick="moveProject(${index}, 1)">&#9660;</button>`
+              ? `<button class="move-button" onclick="moveProject(${index}, 1, event)">&#9660;</button>`
               : "";
-          accordion.innerHTML += `<div>${moveUp} ${moveDown}</div>`;
+          accordion.innerHTML += `<div>${moveUp}${moveDown}</div>`;
 
           const panel = document.createElement("div");
           panel.className = "panel";
           panel.innerHTML = `
-                      <p style="font-weight: bold; padding-top: 15px">Name:</p>
+<p style="font-weight: bold; padding-top: 15px">Name:</p>
                     <input type="text" value="${
                       project.name
                     }" onchange="updateProject(${index}, 'name', this.value)">
-                    <p style="font-weight: bold; padding-top: 15px">Budget (€):</p>
+<p style="font-weight: bold; padding-top: 15px">Budget (€):</p>
                     <input type="text" value="${formatCurrency(
                       project.budget
                     )}" onchange="updateProject(${index}, 'budget', parseFloat(this.value.replace(/[^0-9.-]+/g,'')))">
-                    <p style="font-weight: bold; padding-top: 15px">Billed (€):</p>
+<p style="font-weight: bold; padding-top: 15px">Billed (€):</p>
                     <input type="text" value="${formatCurrency(
                       project.billed
                     )}" onchange="updateProject(${index}, 'billed', parseFloat(this.value.replace(/[^0-9.-]+/g,'')))">
@@ -199,10 +200,26 @@
             var panel = this.nextElementSibling;
             panel.style.display =
               panel.style.display === "block" ? "none" : "block";
+            updateAccordionState(index, panel.style.display === "block");
           };
 
           container.appendChild(accordion);
           container.appendChild(panel);
+        });
+        restoreAccordionStates();
+        displayTotalAccordion();
+      }
+
+      function updateAccordionState(index, isOpen) {
+        accordionStates[index] = isOpen;
+      }
+
+      function restoreAccordionStates() {
+        document.querySelectorAll(".accordion").forEach((accordion, index) => {
+          if (accordionStates[index]) {
+            accordion.classList.add("active");
+            accordion.nextElementSibling.style.display = "block";
+          }
         });
       }
 
@@ -263,8 +280,9 @@
 
       function addProject() {
         const projects = JSON.parse(localStorage.getItem("projects")) || [];
-        projects.push({ name: "New Project", budget: 1000, billed: 0 });
+        projects.push({ name: "New Project", budget: 0, billed: 0 });
         localStorage.setItem("projects", JSON.stringify(projects));
+        saveAccordionStates();
         loadProjects();
       }
 
@@ -272,19 +290,28 @@
         const projects = JSON.parse(localStorage.getItem("projects"));
         projects[index][field] = value;
         localStorage.setItem("projects", JSON.stringify(projects));
+        saveAccordionStates();
         loadProjects();
-        displayTotalAccordion();
       }
 
-      function moveProject(index, direction) {
+      function moveProject(index, direction, event) {
+        event.stopPropagation();
         const projects = JSON.parse(localStorage.getItem("projects"));
         const project = projects[index];
         const newIndex = index + direction;
         projects.splice(index, 1);
         projects.splice(newIndex, 0, project);
         localStorage.setItem("projects", JSON.stringify(projects));
+        saveAccordionStates();
         loadProjects();
-        displayTotalAccordion();
+      }
+
+      function saveAccordionStates() {
+        accordionStates = [];
+        document.querySelectorAll(".accordion").forEach((accordion, index) => {
+          const panel = accordion.nextElementSibling;
+          accordionStates[index] = panel.style.display === "block";
+        });
       }
     </script>
   </body>
