@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <title>FinanceFlow: Track and Visualize Your Project Budgets</title>
+    <title>FinanceFlow</title>
     <style>
       * {
         box-sizing: border-box;
@@ -47,6 +47,7 @@
       }
       .accordion.paid {
         background-color: #e7eff1;
+        color: black;
       }
       .total-accordion {
         background-color: #bbb;
@@ -76,9 +77,6 @@
         border: none;
         transition: background-color 0.3s;
       }
-      button:hover {
-        /*background-color: #0056b3;*/
-      }
       .move-button {
         background: none;
         border: none;
@@ -94,19 +92,29 @@
       .money-display {
         display: flex;
         justify-content: space-between;
-        margin-top: 10px;
+        margin-top: 20px;
       }
       .euro-icon {
         font-size: 2vw;
         margin: 5px;
+      }
+      .overview-p {
+        color: gray;
+        font-size: 0.9em;
+        padding-top: 10px;
       }
     </style>
   </head>
   <body>
     <div id="container">
       <div class="header">
-        <h1 style="padding-bottom: 20px">FinanceFlow</h1>
-        <p>Track and visualize project finances.</p>
+        <h1>FinanceFlow</h1>
+        <p style="padding-top: 20px; padding-bottom: 20px">
+          Track and visualize project finances.
+        </p>
+        <p class="overview-p">Total Billed: <span id="totalBilled"></span></p>
+        <p class="overview-p">Total Budget: <span id="totalBudget"></span></p>
+        <p class="overview-p">Open Budget: <span id="openBudget"></span></p>
       </div>
       <div class="total-summary" id="total-billed"></div>
       <div class="total-summary" id="total-unbilled"></div>
@@ -118,6 +126,21 @@
       document.addEventListener("DOMContentLoaded", function () {
         loadProjects();
         displayTotalAccordion();
+
+        const projects = JSON.parse(localStorage.getItem("projects")) || [];
+        let totalBilled = 0,
+          totalUnbilled = 0;
+        projects.forEach((project) => {
+          totalBilled += Number(project.billed);
+          totalUnbilled += Number(project.budget) - Number(project.billed);
+        });
+        document.getElementById("totalBilled").textContent =
+          formatCurrency(totalBilled);
+        document.getElementById("totalBudget").textContent = formatCurrency(
+          totalBilled + totalUnbilled
+        );
+        document.getElementById("openBudget").textContent =
+          formatCurrency(totalUnbilled);
       });
 
       function loadProjects() {
@@ -146,24 +169,28 @@
           const panel = document.createElement("div");
           panel.className = "panel";
           panel.innerHTML = `
+                      <p style="font-weight: bold; padding-top: 15px">Name:</p>
                     <input type="text" value="${
                       project.name
                     }" onchange="updateProject(${index}, 'name', this.value)">
+                    <p style="font-weight: bold; padding-top: 15px">Budget (€):</p>
                     <input type="text" value="${formatCurrency(
                       project.budget
                     )}" onchange="updateProject(${index}, 'budget', parseFloat(this.value.replace(/[^0-9.-]+/g,'')))">
+                    <p style="font-weight: bold; padding-top: 15px">Billed (€):</p>
                     <input type="text" value="${formatCurrency(
                       project.billed
                     )}" onchange="updateProject(${index}, 'billed', parseFloat(this.value.replace(/[^0-9.-]+/g,'')))">
                     <div class="money-display">
-                        <div style="flex: 1"><p>Billed Amount:</p>${displayIcons(
-                          project.billed / 100,
-                          "💶"
-                        )}</div>
-                        <div style="flex: 1"><p>Open Budget:</p>${displayIcons(
-                          (project.budget - project.billed) / 100,
-                          "💶"
-                        )}</div>
+                        <div style="flex: 1"><p style="font-weight: bold">Billed Amount: (${formatCurrency(
+                          project.billed
+                        )})</p>${displayIcons(project.billed / 100, "💶")}</div>
+                        <div style="flex: 1"><p style="font-weight: bold">Open Budget: (${formatCurrency(
+                          project.budget - project.billed
+                        )})</p>${displayIcons(
+            (project.budget - project.billed) / 100,
+            "💶"
+          )}</div>
                     </div>
                 `;
 
@@ -209,14 +236,12 @@
         });
         panel.innerHTML = `
                 <div class="money-display">
-                    <div style="flex: 1"><p>Total Billed:</p>${displayIcons(
-                      totalBilled / 100,
-                      "💶"
-                    )}</div>
-                    <div style="flex: 1"><p>Total Open Budget:</p>${displayIcons(
-                      totalUnbilled / 100,
-                      "💶"
-                    )}</div>
+                    <div style="flex: 1"><p style="font-weight: bold">Total Billed: (${formatCurrency(
+                      totalBilled
+                    )})</p>${displayIcons(totalBilled / 100, "💶")}</div>
+                    <div style="flex: 1"><p style="font-weight: bold">Total Open Budget: (${formatCurrency(
+                      totalUnbilled
+                    )})</p>${displayIcons(totalUnbilled / 100, "💶")}</div>
                 </div>
             `;
       }
