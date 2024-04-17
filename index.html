@@ -103,6 +103,9 @@
         font-size: 0.9em;
         padding-top: 10px;
       }
+      .delete-button {
+        background-color: #ff3b30;
+      }
     </style>
   </head>
   <body>
@@ -182,6 +185,7 @@
                     <input type="text" value="${formatCurrency(
                       project.billed
                     )}" onchange="updateProject(${index}, 'billed', parseFloat(this.value.replace(/[^0-9.-]+/g,'')))">
+                    <button class="delete-button" onclick="deleteProject(${index})">Delete Project</button>
                     <div class="money-display">
                         <div style="flex: 1"><p style="font-weight: bold">Billed Amount: (${formatCurrency(
                           project.billed
@@ -289,6 +293,14 @@
       function updateProject(index, field, value) {
         const projects = JSON.parse(localStorage.getItem("projects"));
         projects[index][field] = value;
+        localStorage.setItem("projects", JSON.stringify(projects));
+        saveAccordionStates();
+        loadProjects();
+      }
+
+      function deleteProject(index) {
+        const projects = JSON.parse(localStorage.getItem("projects"));
+        projects.splice(index, 1);
         localStorage.setItem("projects", JSON.stringify(projects));
         saveAccordionStates();
         loadProjects();
