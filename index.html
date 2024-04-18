@@ -127,21 +127,6 @@
 
       document.addEventListener("DOMContentLoaded", function () {
         loadProjects();
-
-        const projects = JSON.parse(localStorage.getItem("projects")) || [];
-        let totalBilled = 0,
-          totalUnbilled = 0;
-        projects.forEach((project) => {
-          totalBilled += Number(project.billed);
-          totalUnbilled += Number(project.budget) - Number(project.billed);
-        });
-        document.getElementById("totalBilled").textContent =
-          formatCurrency(totalBilled);
-        document.getElementById("totalBudget").textContent = formatCurrency(
-          totalBilled + totalUnbilled
-        );
-        document.getElementById("openBudget").textContent =
-          formatCurrency(totalUnbilled);
       });
 
       function loadProjects() {
@@ -211,6 +196,24 @@
         });
         restoreAccordionStates();
         displayTotalAccordion();
+        displayTotalSummary(projects);
+      }
+
+      function displayTotalSummary(projects) {
+        const projects = JSON.parse(localStorage.getItem("projects")) || [];
+        let totalBilled = 0,
+          totalUnbilled = 0;
+        projects.forEach((project) => {
+          totalBilled += Number(project.billed);
+          totalUnbilled += Number(project.budget) - Number(project.billed);
+        });
+        document.getElementById("totalBilled").textContent =
+          formatCurrency(totalBilled);
+        document.getElementById("totalBudget").textContent = formatCurrency(
+          totalBilled + totalUnbilled
+        );
+        document.getElementById("openBudget").textContent =
+          formatCurrency(totalUnbilled);
       }
 
       function updateAccordionState(index, isOpen) {
