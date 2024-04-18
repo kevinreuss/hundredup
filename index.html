@@ -258,13 +258,14 @@
           totalUnbilled += Number(project.budget) - Number(project.billed);
         });
         panel.innerHTML = `
-                <div class="money-display">
-                    <div style="flex: 1"><p style="font-weight: bold">Total Billed: (${formatCurrency(
-                      totalBilled
-                    )})</p>${displayIcons(totalBilled / 100, "💶")}</div>
+                <div class="money-display">                    
                     <div style="flex: 1"><p style="font-weight: bold">Total Open Budget: (${formatCurrency(
                       totalUnbilled
                     )})</p>${displayIcons(totalUnbilled / 100, "💶")}</div>
+                    <img src="arrow.png" alt="Your Image Description" style="width:100px; height:auto; object-fit: contain; padding: 15px;">
+                    <div style="flex: 1"><p style="font-weight: bold">Total Billed: (${formatCurrency(
+                      totalBilled
+                    )})</p>${displayIcons(totalBilled / 100, "💶")}</div>
                 </div>
             `;
       }
