@@ -171,15 +171,16 @@
                     )}" onchange="updateProject(${index}, 'billed', parseFloat(this.value.replace(/[^0-9.-]+/g,'')))">
                     <button class="delete-button" onclick="deleteProject(${index})">Delete Project</button>
                     <div class="money-display">
-                        <div style="flex: 1"><p style="font-weight: bold">Billed Amount: (${formatCurrency(
-                          project.billed
-                        )})</p>${displayIcons(project.billed / 100, "💶")}</div>
                         <div style="flex: 1"><p style="font-weight: bold">Open Budget: (${formatCurrency(
                           project.budget - project.billed
                         )})</p>${displayIcons(
             (project.budget - project.billed) / 100,
             "💶"
           )}</div>
+          <img src="arrow.png" alt="Your Image Description" style="width:100px; height:auto; object-fit: contain; padding: 15px;">
+          <div style="flex: 1"><p style="font-weight: bold">Billed Amount: (${formatCurrency(
+            project.billed
+          )})</p>${displayIcons(project.billed / 100, "💶")}</div>
                     </div>
                 `;
 
