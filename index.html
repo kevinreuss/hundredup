@@ -200,7 +200,6 @@
       }
 
       function displayTotalSummary(projects) {
-        const projects = JSON.parse(localStorage.getItem("projects")) || [];
         let totalBilled = 0,
           totalUnbilled = 0;
         projects.forEach((project) => {
